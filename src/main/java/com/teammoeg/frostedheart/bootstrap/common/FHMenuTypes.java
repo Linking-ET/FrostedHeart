@@ -19,6 +19,8 @@
 
 package com.teammoeg.frostedheart.bootstrap.common;
 
+import com.teammoeg.frostedheart.content.town.resource.TownResourceMenu;
+import com.teammoeg.frostedheart.content.town.warehouse.WarehouseBlockEntity;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
 
@@ -77,6 +79,7 @@ public class FHMenuTypes {
 	public static final RegistryObject<MenuType<IncubatorT2Container>> INCUBATOR_T2 = register(HeatIncubatorTileEntity.class, ("heat_incubator"), IncubatorT2Container::new);
 	public static final RegistryObject<MenuType<WardrobeContainer>> WARDROBE = register(WardrobeBlockEntity.class, ("wardrobe"), WardrobeContainer::new);
 
+	public static final RegistryObject<MenuType<TownResourceMenu>> TOWN_RESOURCE = CONTAINERS.register("town_resource", () -> IForgeMenuType.create(TownResourceMenu::new));
 	@SuppressWarnings("unchecked")
 	public static <T extends AbstractContainerMenu, BE extends BlockEntity> RegistryObject<MenuType<T>> register(Class<BE> BEClass, String name, BEMenuFactory<T, BE> factory) {
 		return CONTAINERS.register(name, () -> IForgeMenuType.create((id, inv, pb) -> {

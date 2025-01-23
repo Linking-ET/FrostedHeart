@@ -220,6 +220,15 @@ public class TownResourceHolder {
         return items;
     }
 
+
+    /**
+     * Get all items stored in town.
+     * @return A map that contains all items stored in town, with ItemStackWrapper as key.
+     */
+    public Map<ItemStackWrapper, Double> getAllItemsByWrapper(){
+        return Map.copyOf(itemResources);
+    }
+
     /**
      * Get all items of the given key stored in town.
      * Can't be used to change the resource.
@@ -367,39 +376,6 @@ public class TownResourceHolder {
     public void removeZeros(){
         itemResources.entrySet().removeIf(entry -> Math.abs(entry.getValue()) <= DELTA || entry.getKey().getItemStack().isEmpty());
         virtualResources.entrySet().removeIf(entry ->Math.abs(entry.getValue()) <= DELTA);
-    }
-
-    /**
-     * Wrapper for ItemStack, added special hashCode and equals method, for saving ItemStack in HashMap.
-     * The count of ItemStack will be changed to 1 when creating this wrapper. Because TownResourceHolder used other things to save the amount of items.
-     */
-    @Getter
-    public static class ItemStackWrapper {
-        public ItemStack itemStack;
-
-        public static final Codec<ItemStackWrapper> CODEC = RecordCodecBuilder.create(t -> t.group(
-                CodecUtil.defaultValue(ItemStack.CODEC, ItemStack.EMPTY).fieldOf("itemStack").forGetter(o->o.itemStack)
-                ).apply(t, ItemStackWrapper::new)
-        );
-
-        public ItemStackWrapper(ItemStack itemStack){
-            this.itemStack =itemStack.copyWithCount(1);
-        }
-
-        public boolean equals(Object o){
-            ItemStack itemStack2;
-            if(o instanceof ItemStackWrapper){
-                itemStack2 = ((ItemStackWrapper) o).getItemStack();
-            } else return false;
-            return ItemStack.isSameItemSameTags(itemStack,itemStack2);
-        }
-
-        public int hashCode(){
-            int itemHash = itemStack.getItem().hashCode();
-            int tagHash = itemStack.getTag() == null ? 0 : itemStack.getTag().hashCode();
-            return Objects.hash(itemHash,tagHash);
-        }
-
     }
 
 }

@@ -1,6 +1,13 @@
 package com.teammoeg.frostedheart.content.town.resource;
 
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -8,7 +15,11 @@ import java.util.Map;
 /**
  * 提供了对城镇资源进行操作的一些方法。
  */
-public class TownResourceManager {
+public class TownResourceManager implements MenuProvider {
+
+    //a dummy, used for creating client TownResourceMenu
+    public static final TownResourceManager EMPTY = new TownResourceManager();
+
     public final TownResourceHolder resourceHolder;
 
     public TownResourceManager(TownResourceHolder holder){
@@ -455,5 +466,15 @@ public class TownResourceManager {
         Arrays.stream(VirtualResourceType.values())
                 .filter(type -> type.isService)
                 .forEach(type -> set(type,0));
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.translatable("container.town_resource_manager");
+    }
+
+    @Override
+    public @Nullable AbstractContainerMenu createMenu(int containerID/*我不确定是否是containerID，我假装它是，能跑就行——duck_egg*/, @NotNull Inventory inventory, @NotNull Player player) {
+        return null;//todo
     }
 }
