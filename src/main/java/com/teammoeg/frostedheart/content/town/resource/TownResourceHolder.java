@@ -34,6 +34,8 @@ public class TownResourceHolder {
     @Getter
     private double occupiedCapacity = 0.0;
 
+    public static final TownResourceHolder EMPTY = new TownResourceHolder(new HashMap<>(), new HashMap<>());
+
     /**
      * 缓存ItemResourceKey对应的物品。
      * 存储在城镇中的物品，在读取数据，即创建新TownResourceHolder实例时，都会顺带加入缓存中。
@@ -175,6 +177,13 @@ public class TownResourceHolder {
      */
     public double get(ItemStack pItemStack){
         return get(new ItemStackWrapper(pItemStack));
+    }
+
+    /**
+     * 获取城镇剩余(未被占用)的容量。
+     */
+    public double getCapacityLeft(){
+        return get(VirtualResourceType.MAX_CAPACITY.generateKey(0)) - this.getOccupiedCapacity();
     }
 
     /**

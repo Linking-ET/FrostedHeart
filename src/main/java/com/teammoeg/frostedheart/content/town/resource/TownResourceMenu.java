@@ -11,7 +11,7 @@ import java.util.Map;
 public class TownResourceMenu extends CBaseMenu {
     public static final int INV_START = 16;//todo: 待定
 
-    TownResourceManager resourceManager = TownResourceManager.EMPTY;
+    //TownResourceManager resourceManager = TownResourceManager.EMPTY;
     Map<ItemStackWrapper, Double> items = new HashMap<>();
 
     public TownResourceMenu(int pContainerId, Inventory playerInventory, FriendlyByteBuf byteBuf){
@@ -20,6 +20,6 @@ public class TownResourceMenu extends CBaseMenu {
 
     public TownResourceMenu(int pContainerId, Inventory playerInventory, TownResourceManager resourceManager){
         super(FHMenuTypes.TOWN_RESOURCE.get(), pContainerId, playerInventory.player, INV_START);
-        this.resourceManager = resourceManager;
+        //this.resourceManager = resourceManager;
     }
 }

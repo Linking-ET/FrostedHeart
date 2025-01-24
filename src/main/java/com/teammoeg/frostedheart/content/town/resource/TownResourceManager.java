@@ -14,11 +14,9 @@ import java.util.Map;
 
 /**
  * 提供了对城镇资源进行操作的一些方法。
+ * 借助此类，可以利用TownResourceKey对城镇资源进行操作。
  */
 public class TownResourceManager implements MenuProvider {
-
-    //a dummy, used for creating client TownResourceMenu
-    public static final TownResourceManager EMPTY = new TownResourceManager();
 
     public final TownResourceHolder resourceHolder;
 
@@ -28,6 +26,10 @@ public class TownResourceManager implements MenuProvider {
 
     public TownResourceManager(){
         this.resourceHolder = new TownResourceHolder();
+    }
+
+    public static TownResourceManager of(TownResourceHolder holder){
+        return new TownResourceManager(holder);
     }
 
     /**
