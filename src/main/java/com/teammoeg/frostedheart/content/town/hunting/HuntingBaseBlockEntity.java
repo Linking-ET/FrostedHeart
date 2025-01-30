@@ -6,7 +6,7 @@ import com.teammoeg.frostedheart.content.steamenergy.HeatEndpoint;
 import com.teammoeg.frostedheart.content.town.*;
 import com.teammoeg.frostedheart.content.town.house.HouseBlockScanner;
 import com.teammoeg.frostedheart.content.town.house.HouseBlockEntity;
-import com.teammoeg.frostedheart.content.town.resource.ResourceActionResult;
+import com.teammoeg.frostedheart.content.town.resource.action.SimpleResourceActionResult;
 import com.teammoeg.frostedheart.util.client.FHClientUtils;
 import com.teammoeg.frostedheart.content.town.blockscanner.BlockScanner;
 import com.teammoeg.frostedheart.content.town.blockscanner.FloorBlockScanner;
@@ -215,7 +215,7 @@ public class HuntingBaseBlockEntity extends AbstractTownWorkerBlockEntity {
                     Iterator<SimpleEntry<TownWorkerData, Double>> iterator = camps.iterator();
                     while(iterator.hasNext() && residentsLeft > 0){
                         double add = iterator.next().getValue();
-                        ResourceActionResult result = town.getResourceManager().addToMax(new ItemStack(Items.BEEF), add);
+                        SimpleResourceActionResult result = town.getResourceManager().addToMax(new ItemStack(Items.BEEF), add);
                         if(result.actualAmount() != add) return false;
                         residentsLeft--;
                     }

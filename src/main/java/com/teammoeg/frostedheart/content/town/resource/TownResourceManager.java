@@ -1,5 +1,6 @@
 package com.teammoeg.frostedheart.content.town.resource;
 
+import com.teammoeg.frostedheart.content.town.resource.action.SimpleResourceActionResult;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -61,7 +62,7 @@ public class TownResourceManager implements MenuProvider {
      * 获取城镇剩余(未被占用)的容量。
      */
     public double getCapacityLeft(){
-        return get(VirtualResourceType.MAX_CAPACITY.generateKey(0)) - resourceHolder.getOccupiedCapacity();
+        return Math.max(get(VirtualResourceType.MAX_CAPACITY.generateKey(0)) - resourceHolder.getOccupiedCapacity(), 0);
     }
 
     /**
@@ -93,17 +94,17 @@ public class TownResourceManager implements MenuProvider {
      * @param key The resource key
      * @param amount The amount to add
      */
-    public ResourceActionResult addIfHaveCapacity(VirtualResourceKey key, double amount){
+    public SimpleResourceActionResult addIfHaveCapacity(VirtualResourceKey key, double amount){
         if(!key.type.needCapacity){
             resourceHolder.addUnsafe(key,amount);
-            return new ResourceActionResult(true, amount, key);
+            return new SimpleResourceActionResult(true, amount);
         }
         double spaceLeft = getCapacityLeft();
         if(spaceLeft>=amount){
             resourceHolder.addUnsafe(key,amount);
-            return new ResourceActionResult(true, amount, key);
+            return new SimpleResourceActionResult(true, amount);
         }
-        return ResourceActionResult.NOT_SUCCESS;
+        return SimpleResourceActionResult.NOT_SUCCESS;
     }
 
     /**
@@ -112,7 +113,7 @@ public class TownResourceManager implements MenuProvider {
      * @param type The virtual resource type, which will be converted to a VirtualResourceKey with level 0.
      * @param amount The amount to add
      */
-    public ResourceActionResult addIfHaveCapacity(VirtualResourceType type, double amount){
+    public SimpleResourceActionResult addIfHaveCapacity(VirtualResourceType type, double amount){
         return addIfHaveCapacity(type.generateKey(0), amount);
     }
 
@@ -121,13 +122,13 @@ public class TownResourceManager implements MenuProvider {
      * @param itemStack The item to add. The count of item will be ignored.
      * @param amount The amount to add
      */
-    public ResourceActionResult addIfHaveCapacity(ItemStack itemStack, double amount){
+    public SimpleResourceActionResult addIfHaveCapacity(ItemStack itemStack, double amount){
         double spaceLeft = getCapacityLeft();
         if(spaceLeft>=amount){
             resourceHolder.addUnsafe(itemStack, amount);
-            return new ResourceActionResult(true, amount, 0, 0);
+            return new SimpleResourceActionResult(true, amount);
         }
-        return ResourceActionResult.NOT_SUCCESS;
+        return SimpleResourceActionResult.NOT_SUCCESS;
     }
 
     //You can't add ItemResourceKey to town, because item resource are saved as ItemStack.
@@ -138,19 +139,19 @@ public class TownResourceManager implements MenuProvider {
      * @param amount The amount to add.
      * @return The result of the action. You can know if all the resource is added, and how many resources are added.
      */
-    public ResourceActionResult addToMax(VirtualResourceKey key, double amount){
+    public SimpleResourceActionResult addToMax(VirtualResourceKey key, double amount){
         if(!key.type.needCapacity){
             resourceHolder.addUnsafe(key,amount);
-            return new ResourceActionResult(true, amount, key);
+            return new SimpleResourceActionResult(true, amount);
         }
         double capacityLeft = getCapacityLeft();
-        if(capacityLeft <= 0) return ResourceActionResult.NOT_SUCCESS;
+        if(capacityLeft <= 0) return SimpleResourceActionResult.NOT_SUCCESS;
         if(capacityLeft>=amount){
             resourceHolder.addUnsafe(key,amount);
-            return new ResourceActionResult(true, amount, key);
+            return new SimpleResourceActionResult(true, amount);
         } else {
             resourceHolder.addUnsafe(key,capacityLeft);
-            return new ResourceActionResult(false, capacityLeft, key);
+            return new SimpleResourceActionResult(false, capacityLeft);
         }
     }
 
@@ -160,15 +161,15 @@ public class TownResourceManager implements MenuProvider {
      * @param amount The amount to add.
      * @return The result of the action. You can know if all the resource is added, and how many resources are added.
      */
-    public ResourceActionResult addToMax(ItemStack itemStack, double amount){
+    public SimpleResourceActionResult addToMax(ItemStack itemStack, double amount){
         double capacityLeft = getCapacityLeft();
-        if(capacityLeft <= 0) return ResourceActionResult.NOT_SUCCESS;
+        if(capacityLeft <= 0) return SimpleResourceActionResult.NOT_SUCCESS;
         if(capacityLeft>=amount){
             resourceHolder.addUnsafe( itemStack,amount);
-            return new ResourceActionResult(true, amount, 0, 0);
+            return new SimpleResourceActionResult(true, amount);
         } else {
             resourceHolder.addUnsafe(itemStack,capacityLeft);
-            return new ResourceActionResult(false, capacityLeft, 0, 0);
+            return new SimpleResourceActionResult(false, capacityLeft);
         }
     }
 
@@ -177,13 +178,13 @@ public class TownResourceManager implements MenuProvider {
      * If there is not enough resource, nothing will be cost.
      * @return The result of the action. You can know if all the resource is costed, and how many resources are costed, etc.
      */
-    public ResourceActionResult costIfHaveEnough(VirtualResourceKey key, double amount){
-        if(amount <=0) return ResourceActionResult.NOT_SUCCESS;
+    public SimpleResourceActionResult costIfHaveEnough(VirtualResourceKey key, double amount){
+        if(amount <=0) return SimpleResourceActionResult.NOT_SUCCESS;
         if(get(key) >= amount){
             resourceHolder.costUnsafe(key,amount);
-            return new ResourceActionResult(true, amount, key);
+            return new SimpleResourceActionResult(true, amount);
         } else {
-            return ResourceActionResult.NOT_SUCCESS;
+            return SimpleResourceActionResult.NOT_SUCCESS;
         }
     }
 
@@ -192,13 +193,13 @@ public class TownResourceManager implements MenuProvider {
      * If there is not enough item, nothing will be cost.
      * @return The result of the action. You can know if all the resource is costed, and how many resources are costed, etc.
      */
-    public ResourceActionResult costIfHaveEnough(ItemStack itemStack, double amount){
-        if(amount <=0) return ResourceActionResult.NOT_SUCCESS;
+    public SimpleResourceActionResult costIfHaveEnough(ItemStack itemStack, double amount){
+        if(amount <=0) return SimpleResourceActionResult.NOT_SUCCESS;
         if(get(itemStack) >= amount){
             resourceHolder.costUnsafe(itemStack,amount);
-            return new ResourceActionResult(true, amount, 0, 0);
+            return new SimpleResourceActionResult(true, amount);
         } else {
-            return ResourceActionResult.NOT_SUCCESS;
+            return SimpleResourceActionResult.NOT_SUCCESS;
         }
     }
 
@@ -210,25 +211,25 @@ public class TownResourceManager implements MenuProvider {
      * 我也不知道这个“某种顺序”究竟是什么，这取决于从缓存中读取的顺序。
      * @return The result of the action. You can know if all the resource is costed, and how many resources are costed, etc.
      */
-    public ResourceActionResult costIfHaveEnough(ItemResourceKey key, double amount){
+    public SimpleResourceActionResult costIfHaveEnough(ItemResourceKey key, double amount){
         double resourceLeft = get(key);
-        if(resourceLeft<=amount) return ResourceActionResult.NOT_SUCCESS;
+        if(resourceLeft<=amount) return SimpleResourceActionResult.NOT_SUCCESS;
         double toCost;
         Map<ItemStack, Double> items = resourceHolder.getAllItems(key);
         toCost = amount;
         for(ItemStack itemStack : items.keySet()){
             double itemResourceAmount = TownResourceHolder.getResourceAmount(itemStack, key);
-            ResourceActionResult result = costToEmpty(itemStack, toCost / itemResourceAmount);
+            SimpleResourceActionResult result = costToEmpty(itemStack, toCost / itemResourceAmount);
             toCost -= result.actualAmount() * itemResourceAmount;
             if(toCost<=TownResourceHolder.DELTA) break;
         }
-        return new ResourceActionResult(true, amount, key);
+        return new SimpleResourceActionResult(true, amount);
     }
 
-    public ResourceActionResult costIfHaveEnough(ITownResourceKey key, double amount){
+    public SimpleResourceActionResult costIfHaveEnough(ITownResourceKey key, double amount){
         if(key instanceof ItemResourceKey) return costIfHaveEnough((ItemResourceKey)key, amount);
         if(key instanceof VirtualResourceKey) return costIfHaveEnough((VirtualResourceKey)key, amount);
-        return ResourceActionResult.NOT_SUCCESS;
+        return SimpleResourceActionResult.NOT_SUCCESS;
     }
 
     /**
@@ -237,15 +238,15 @@ public class TownResourceManager implements MenuProvider {
      * @param itemStack The item to cost. The count of item will be ignored.
      * @return The result of the action. You can know if all the resource is costed, and how many resources are costed, etc.
      */
-    public ResourceActionResult costToEmpty(ItemStack itemStack, double amount){
+    public SimpleResourceActionResult costToEmpty(ItemStack itemStack, double amount){
         double resourceLeft = get(itemStack);
-        if(resourceLeft<=0) return ResourceActionResult.NOT_SUCCESS;
+        if(resourceLeft<=0) return SimpleResourceActionResult.NOT_SUCCESS;
         if(resourceLeft>=amount){
             resourceHolder.costUnsafe(itemStack,amount);
-            return new ResourceActionResult(true, amount);
+            return new SimpleResourceActionResult(true, amount);
         } else {
             resourceHolder.costUnsafe(itemStack,resourceLeft);
-            return new ResourceActionResult(false, resourceLeft);
+            return new SimpleResourceActionResult(false, resourceLeft);
         }
     }
 
@@ -257,18 +258,18 @@ public class TownResourceManager implements MenuProvider {
      * 我也不知道这个“某种顺序”究竟是什么，这取决于从缓存中读取的顺序。
      * @return The result of the action. You can know if all the resource is costed, and how many resources are costed, etc.
      */
-    public ResourceActionResult costToEmpty(ItemResourceKey key, double amount){
+    public SimpleResourceActionResult costToEmpty(ItemResourceKey key, double amount){
         double resourceLeft = get(key);
         double toCost;
         Map<ItemStack, Double> items = resourceHolder.getAllItems(key);
         toCost = Math.min(resourceLeft, amount);
         for(ItemStack itemStack : items.keySet()){
             double itemResourceAmount = TownResourceHolder.getResourceAmount(itemStack, key);
-            ResourceActionResult result = costToEmpty(itemStack, toCost / itemResourceAmount);
+            SimpleResourceActionResult result = costToEmpty(itemStack, toCost / itemResourceAmount);
             toCost -= result.actualAmount() * itemResourceAmount;
             if(toCost<=TownResourceHolder.DELTA) break;
         }
-        return new ResourceActionResult(amount <= resourceLeft, Math.min(resourceLeft, amount), key);
+        return new SimpleResourceActionResult(amount <= resourceLeft, Math.min(resourceLeft, amount));
     }
 
     /**
@@ -276,12 +277,12 @@ public class TownResourceManager implements MenuProvider {
      * If there is not enough resource, nothing will be cost.
      * @return The result of the action. You can know if all the resource is costed, and how many resources are costed, etc.
      */
-    public ResourceActionResult costToEmpty(VirtualResourceKey key, double amount){
-        if(amount <=0) return ResourceActionResult.NOT_SUCCESS;
+    public SimpleResourceActionResult costToEmpty(VirtualResourceKey key, double amount){
+        if(amount <=0) return SimpleResourceActionResult.NOT_SUCCESS;
         double resourceLeft = get(key);
-        if(resourceLeft<=0) return ResourceActionResult.NOT_SUCCESS;
+        if(resourceLeft<=0) return SimpleResourceActionResult.NOT_SUCCESS;
         resourceHolder.costUnsafe(key,Math.min(resourceLeft, amount));
-        return new ResourceActionResult(true, Math.min(resourceLeft, amount), key);
+        return new SimpleResourceActionResult(true, Math.min(resourceLeft, amount));
     }
 
     /**
@@ -289,10 +290,10 @@ public class TownResourceManager implements MenuProvider {
      * If there is not enough resource, nothing will be cost.
      * @return The result of the action. You can know if all the resource is costed, and how many resources are costed, etc.
      */
-    public ResourceActionResult costToEmpty(ITownResourceKey key, double amount){
+    public SimpleResourceActionResult costToEmpty(ITownResourceKey key, double amount){
         if(key instanceof ItemResourceKey) return costToEmpty((ItemResourceKey)key, amount);
         else if (key instanceof VirtualResourceKey) return costToEmpty((VirtualResourceKey)key, amount);
-        return ResourceActionResult.NOT_SUCCESS;
+        return SimpleResourceActionResult.NOT_SUCCESS;
     }
 
     /**
@@ -301,20 +302,20 @@ public class TownResourceManager implements MenuProvider {
      * 消耗顺序为：先消耗level低的TownResourceKey，后消耗level高的
      * If there is not enough resource, nothing will be cost.
      */
-    public ResourceActionResult costBetweenLevelIfHaveEnough(ITownResourceType type, double amount, int minLevel, int maxLevel){
-        if(amount <=0) return ResourceActionResult.NOT_SUCCESS;
-        if(minLevel>maxLevel) return ResourceActionResult.NOT_SUCCESS;
-        if(!type.isLevelValid(minLevel) || !type.isLevelValid(maxLevel)) return ResourceActionResult.NOT_SUCCESS;
+    public SimpleResourceActionResult costBetweenLevelIfHaveEnough(ITownResourceType type, double amount, int minLevel, int maxLevel){
+        if(amount <=0) return SimpleResourceActionResult.NOT_SUCCESS;
+        if(minLevel>maxLevel) return SimpleResourceActionResult.NOT_SUCCESS;
+        if(!type.isLevelValid(minLevel) || !type.isLevelValid(maxLevel)) return SimpleResourceActionResult.NOT_SUCCESS;
         double resourceLeft = getAllBetweenLevel(type,minLevel, maxLevel);
         if(resourceLeft < amount) {
-            return ResourceActionResult.NOT_SUCCESS;
+            return SimpleResourceActionResult.NOT_SUCCESS;
         }
         double resourcesToCost = amount;
         int minLevelCount = maxLevel;
         double averageLevelCount = 0;
         for(int level = minLevel; level <= maxLevel; level++){
             if(resourcesToCost<=0) break;
-            ResourceActionResult result = costToEmpty(type.generateKey(level), resourcesToCost);
+            SimpleResourceActionResult result = costToEmpty(type.generateKey(level), resourcesToCost);
             resourcesToCost -= result.actualAmount();
             if(result.allSuccess()){
                 minLevelCount = Math.min(minLevelCount, level);
@@ -322,7 +323,7 @@ public class TownResourceManager implements MenuProvider {
             averageLevelCount += result.actualAmount() * level;
         }
         averageLevelCount /= amount;
-        return new ResourceActionResult(true, amount, minLevelCount, averageLevelCount);
+        return new SimpleResourceActionResult(true, amount);
     }
 
     /**
@@ -331,7 +332,7 @@ public class TownResourceManager implements MenuProvider {
      * 消耗顺序为：先消耗level低的TownResourceKey，后消耗level高的
      * If there is not enough resource, nothing will be cost.
      */
-    public ResourceActionResult costAboveLevelIfHaveEnough(ITownResourceType type, double amount, int minLevel){
+    public SimpleResourceActionResult costAboveLevelIfHaveEnough(ITownResourceType type, double amount, int minLevel){
         return costBetweenLevelIfHaveEnough(type, amount, minLevel, type.getMaxLevel());
     }
 
@@ -341,7 +342,7 @@ public class TownResourceManager implements MenuProvider {
      * 消耗顺序为：先消耗level低的TownResourceKey，后消耗level高的
      * If there is not enough resource, nothing will be cost.
      */
-    public ResourceActionResult costLowestLevelIfHaveEnough(ITownResourceType type, double amount){
+    public SimpleResourceActionResult costLowestLevelIfHaveEnough(ITownResourceType type, double amount){
         return costAboveLevelIfHaveEnough(type, amount, 0);
     }
 
@@ -351,19 +352,19 @@ public class TownResourceManager implements MenuProvider {
      * 消耗顺序为：先消耗level高的TownResourceKey，后消耗level低的
      * If there is not enough resource, nothing will be cost.
      */
-    public ResourceActionResult costHighestLevelIfHaveEnough(ITownResourceType type, double amount){
-        if(amount <=0) return ResourceActionResult.NOT_SUCCESS;
+    public SimpleResourceActionResult costHighestLevelIfHaveEnough(ITownResourceType type, double amount){
+        if(amount <=0) return SimpleResourceActionResult.NOT_SUCCESS;
         int maxLevel = type.getMaxLevel();
         double resourceLeft = getAllBetweenLevel(type,0, maxLevel);
         if(resourceLeft < amount) {
-            return ResourceActionResult.NOT_SUCCESS;
+            return SimpleResourceActionResult.NOT_SUCCESS;
         }
         double resourcesToCost = amount;
         int minLevelCount = maxLevel;
         double averageLevelCount = 0;
         for(int level = maxLevel; level >= 0; level--){
             if(resourcesToCost<=0) break;
-            ResourceActionResult result = costToEmpty(type.generateKey(level), resourcesToCost);
+            SimpleResourceActionResult result = costToEmpty(type.generateKey(level), resourcesToCost);
             resourcesToCost -= result.actualAmount();
             if(result.allSuccess()){
                 minLevelCount = Math.min(minLevelCount, level);
@@ -371,7 +372,7 @@ public class TownResourceManager implements MenuProvider {
             averageLevelCount += result.actualAmount() * level;
         }
         averageLevelCount /= amount;
-        return new ResourceActionResult(true, amount, minLevelCount, averageLevelCount);
+        return new SimpleResourceActionResult(true, amount);
     }
 
     /**
@@ -380,17 +381,17 @@ public class TownResourceManager implements MenuProvider {
      * 消耗顺序为：先消耗level低的TownResourceKey，后消耗level高的
      * If there is not enough resource, all resource left will be cost.
      */
-    public ResourceActionResult costBetweenLevelToEmpty(ITownResourceType type, double amount, int minLevel, int maxLevel){
-        if(amount <=0) return ResourceActionResult.NOT_SUCCESS;
-        if(minLevel>maxLevel) return ResourceActionResult.NOT_SUCCESS;
-        if(!type.isLevelValid(minLevel) || !type.isLevelValid(maxLevel)) return ResourceActionResult.NOT_SUCCESS;
+    public SimpleResourceActionResult costBetweenLevelToEmpty(ITownResourceType type, double amount, int minLevel, int maxLevel){
+        if(amount <=0) return SimpleResourceActionResult.NOT_SUCCESS;
+        if(minLevel>maxLevel) return SimpleResourceActionResult.NOT_SUCCESS;
+        if(!type.isLevelValid(minLevel) || !type.isLevelValid(maxLevel)) return SimpleResourceActionResult.NOT_SUCCESS;
         double resourceLeft = getAllBetweenLevel(type,minLevel, maxLevel);
         double resourcesToCost = Math.min(amount, resourceLeft);
         int minLevelCount = maxLevel;
         double averageLevelCount = 0;
         for(int level = minLevel; level <= maxLevel; level++){
             if(resourcesToCost<=0) break;
-            ResourceActionResult result = costToEmpty(type.generateKey(level), resourcesToCost);
+            SimpleResourceActionResult result = costToEmpty(type.generateKey(level), resourcesToCost);
             resourcesToCost -= result.actualAmount();
             if(result.allSuccess()){
                 minLevelCount = Math.min(minLevelCount, level);
@@ -398,7 +399,7 @@ public class TownResourceManager implements MenuProvider {
             averageLevelCount += result.actualAmount() * level;
         }
         averageLevelCount /= amount;
-        return new ResourceActionResult(true, Math.min(amount, resourceLeft), minLevelCount, averageLevelCount);
+        return new SimpleResourceActionResult(true, Math.min(amount, resourceLeft));
     }
 
     /**
@@ -407,7 +408,7 @@ public class TownResourceManager implements MenuProvider {
      * 消耗顺序为：先消耗level低的TownResourceKey，后消耗level高的
      * If there is not enough resource, all resource left will be cost.
      */
-    public ResourceActionResult costAboveLevelToEmpty(ITownResourceType type, double amount, int minLevel){
+    public SimpleResourceActionResult costAboveLevelToEmpty(ITownResourceType type, double amount, int minLevel){
         return costBetweenLevelToEmpty(type, amount, minLevel, type.getMaxLevel());
     }
 
@@ -417,7 +418,7 @@ public class TownResourceManager implements MenuProvider {
      * 消耗顺序为：先消耗level低的TownResourceKey，后消耗level高的
      * If there is not enough resource, all resource left will be cost.
      */
-    public ResourceActionResult costLowestLevelToEmpty(ITownResourceType type, double amount){
+    public SimpleResourceActionResult costLowestLevelToEmpty(ITownResourceType type, double amount){
         return costBetweenLevelToEmpty(type, amount, 0, 0);
     }
 
@@ -427,8 +428,8 @@ public class TownResourceManager implements MenuProvider {
      * 消耗顺序为：先消耗level高的TownResourceKey，后消耗level低的
      * If there is not enough resource, all resource left will be cost.
      */
-    public ResourceActionResult costHighestLevelToEmpty(ITownResourceType type, double amount){
-        if(amount <=0) return ResourceActionResult.NOT_SUCCESS;
+    public SimpleResourceActionResult costHighestLevelToEmpty(ITownResourceType type, double amount){
+        if(amount <=0) return SimpleResourceActionResult.NOT_SUCCESS;
         int maxLevel = type.getMaxLevel();
         double resourceLeft = getAllBetweenLevel(type,0, maxLevel);
         double resourcesToCost = Math.min(amount, resourceLeft);
@@ -436,7 +437,7 @@ public class TownResourceManager implements MenuProvider {
         double averageLevelCount = 0;
         for(int level = maxLevel; level >= 0; level--){
             if(resourcesToCost<=0) break;
-            ResourceActionResult result = costToEmpty(type.generateKey(level), resourcesToCost);
+            SimpleResourceActionResult result = costToEmpty(type.generateKey(level), resourcesToCost);
             resourcesToCost -= result.actualAmount();
             if(result.allSuccess()){
                 minLevelCount = Math.min(minLevelCount, level);
@@ -444,7 +445,7 @@ public class TownResourceManager implements MenuProvider {
             averageLevelCount += result.actualAmount() * level;
         }
         averageLevelCount /= amount;
-        return new ResourceActionResult(true, Math.min(amount, resourceLeft), minLevelCount, averageLevelCount);
+        return new SimpleResourceActionResult(true, Math.min(amount, resourceLeft));
     }
 
     /**

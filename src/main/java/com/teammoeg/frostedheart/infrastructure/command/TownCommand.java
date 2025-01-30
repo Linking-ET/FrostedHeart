@@ -32,6 +32,7 @@ import com.teammoeg.chorda.util.lang.Components;
 import com.teammoeg.frostedheart.FHMain;
 import com.teammoeg.frostedheart.content.town.TeamTown;
 import com.teammoeg.frostedheart.content.town.resident.Resident;
+import com.teammoeg.frostedheart.content.town.resource.action.SimpleResourceActionResult;
 import com.teammoeg.frostedheart.util.client.Lang;
 import com.teammoeg.frostedheart.content.town.resource.*;
 import net.minecraft.commands.CommandSourceStack;
@@ -96,7 +97,7 @@ public class TownCommand {
                                                         return Command.SINGLE_SUCCESS;
                                                     }
                                                     TeamTown town = TeamTown.from(ct.getSource().getPlayerOrException());
-                                                    ResourceActionResult result = town.getResourceManager().addIfHaveCapacity(VirtualResourceType.from(type).generateKey(level), amount);
+                                                    SimpleResourceActionResult result = town.getResourceManager().addIfHaveCapacity(VirtualResourceType.from(type).generateKey(level), amount);
                                                     if(result.allSuccess()){
                                                         ct.getSource().sendSuccess(()-> Components.str("Resource added"), true);
                                                     } else ct.getSource().sendSuccess(()-> Components.str("Resource added failed: No enough capacity."), true);
@@ -138,7 +139,7 @@ public class TownCommand {
                                                         return Command.SINGLE_SUCCESS;
                                                     }
                                                     TeamTown town = TeamTown.from(ct.getSource().getPlayerOrException());
-                                                    ResourceActionResult result = null;
+                                                    SimpleResourceActionResult result = null;
                                                     result = town.getResourceManager().costIfHaveEnough(type.generateKey(level), amount);
                                                     if(result.allSuccess()){
                                                         ct.getSource().sendSuccess(()-> Components.str("Resource costed."), true);
@@ -157,7 +158,7 @@ public class TownCommand {
                                     TeamTown town = TeamTown.from(ct.getSource().getPlayerOrException());
                                     ItemStack itemStack = ct.getSource().getPlayerOrException().getMainHandItem();
                                     ct.getSource().sendSuccess(()-> Components.str("Adding ItemStack: " + itemStack), true);
-                                    ResourceActionResult result = town.getResourceManager().addIfHaveCapacity(itemStack, amount);
+                                    SimpleResourceActionResult result = town.getResourceManager().addIfHaveCapacity(itemStack, amount);
                                     if(result.allSuccess()){
                                         ct.getSource().sendSuccess(()-> Components.str("Resource added"), true);
                                         return Command.SINGLE_SUCCESS;
