@@ -26,6 +26,7 @@ public class TownResourceHolder {
      */
     private Map<ItemStackWrapper, Double> itemResources = new HashMap<>();
     private Map<VirtualResourceKey, Double> virtualResources = new HashMap<>();
+    public List<TownResourceMenu> menusOfThisHolder = new ArrayList<>();
     /**
      * 表示已占用的资源容量。
      * 使用此类的中的addUnsafe和costUnsafe方法修改需要占用容量的资源时，已占用资源会随之修改。
@@ -252,6 +253,21 @@ public class TownResourceHolder {
         }
         return items;
     }
+    /**
+     * 与上面那个方法相同，只不过输出的是ItemStackWrapper为Key的Map
+     * Get all items of the given key stored in town.
+     * Can't be used to change the resource.
+     * @return A map that contains all items of the given key stored in town.
+     */
+    public Map<ItemStackWrapper, Double> getAllItemsByWrapper(ItemResourceKey key){
+        Map<ItemStackWrapper, Double> items = new HashMap<>();
+        for(ItemStackWrapper itemStackWrapper : ITEM_RESOURCE_KEY_CACHE.get(key)){
+            if(get(itemStackWrapper) > DELTA){
+                items.put(itemStackWrapper, get(itemStackWrapper) * getResourceAmount(itemStackWrapper, key));
+            }
+        }
+        return items;
+    }
 
     public Map<VirtualResourceKey, Double> getAllVirtualResources() {
         return Map.copyOf(virtualResources);
@@ -263,9 +279,7 @@ public class TownResourceHolder {
      * Use addUnsafe and costUnsafe in this package.
      * Use methods in TownResourceManager in other classes.
      */
-    private void addSigned(ItemStack pItemStack, double amount){
-        if(pItemStack.isEmpty()) return;
-        ItemStackWrapper itemStackWrapper = new ItemStackWrapper(pItemStack);
+    private void addSigned(ItemStackWrapper itemStackWrapper, double amount){
         Double amountExist = itemResources.get(itemStackWrapper);
         if(amountExist == null || amountExist <= DELTA){
             addItemToCache(itemStackWrapper);
@@ -274,6 +288,9 @@ public class TownResourceHolder {
             itemResources.remove(itemStackWrapper);
         }
         this.occupiedCapacity += amount;
+    }
+    private void addSigned(ItemStack itemStack, double amount){
+        addSigned(new ItemStackWrapper(itemStack), amount);
     }
     private void addSigned(VirtualResourceKey key, double amount){
         virtualResources.merge(key, amount, Double::sum);
@@ -305,6 +322,12 @@ public class TownResourceHolder {
             throw new IllegalArgumentException("Amount putted in addUnsafe() must be positive.");
         }
         addSigned(ItemStack, amount);
+    }
+    void addUnsafe(ItemStackWrapper itemStackWrapper, double amount){
+        if(amount < 0){
+            throw new IllegalArgumentException("Amount putted in addUnsafe() must be positive.");
+        }
+        addSigned(itemStackWrapper, amount);
     }
 
 
@@ -339,6 +362,13 @@ public class TownResourceHolder {
             throw new IllegalArgumentException("Amount putted in costUnsafe() must be positive.");
         }
         addSigned(itemStack, -amount);
+    }
+
+    void costUnsafe(ItemStackWrapper itemStackWrapper, double amount){
+        if(amount < 0){
+            throw new IllegalArgumentException("Amount putted in costUnsafe() must be positive.");
+        }
+        addSigned(itemStackWrapper, -amount);
     }
 
     /**

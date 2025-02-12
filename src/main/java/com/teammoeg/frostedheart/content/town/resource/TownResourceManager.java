@@ -1,6 +1,5 @@
 package com.teammoeg.frostedheart.content.town.resource;
 
-import com.teammoeg.frostedheart.content.town.resource.action.SimpleResourceActionResult;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -18,6 +17,8 @@ import java.util.Map;
  * 借助此类，可以利用TownResourceKey对城镇资源进行操作。
  */
 public class TownResourceManager implements MenuProvider {
+
+    public static final TownResourceManager EMPTY = new TownResourceManager();
 
     public final TownResourceHolder resourceHolder;
 

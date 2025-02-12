@@ -32,7 +32,7 @@ import com.teammoeg.frostedheart.content.town.hunting.HuntingBaseBlockEntity;
 import com.teammoeg.frostedheart.content.town.mine.MineWorker;
 import com.teammoeg.frostedheart.content.town.resident.Resident;
 import com.teammoeg.frostedheart.content.town.resource.ItemResourceType;
-import com.teammoeg.frostedheart.content.town.resource.action.SimpleResourceActionResult;
+import com.teammoeg.frostedheart.content.town.resource.SimpleResourceActionResult;
 import com.teammoeg.frostedheart.content.town.warehouse.WarehouseWorker;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.nbt.CompoundTag;

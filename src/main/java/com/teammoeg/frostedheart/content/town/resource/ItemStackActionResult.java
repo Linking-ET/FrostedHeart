@@ -1,6 +1,8 @@
-package com.teammoeg.frostedheart.content.town.resource.action;
+package com.teammoeg.frostedheart.content.town.resource;
 
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 /**
  * @param action 对应的ItemStackAction
@@ -14,5 +16,14 @@ public record ItemStackActionResult(ItemStackAction action, Boolean allModified,
     @Override
     public ItemStackAction getAction(){
         return action;
+    }
+
+    @Override
+    public void applyForce(TownResourceHolder resourceHolder){
+        if(action.isAdd()){
+            resourceHolder.addUnsafe(itemStackModified);
+        }else {
+            resourceHolder.costUnsafe(itemStackModified);
+        }
     }
 }

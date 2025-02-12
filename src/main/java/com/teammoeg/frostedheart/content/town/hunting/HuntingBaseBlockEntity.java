@@ -6,7 +6,7 @@ import com.teammoeg.frostedheart.content.steamenergy.HeatEndpoint;
 import com.teammoeg.frostedheart.content.town.*;
 import com.teammoeg.frostedheart.content.town.house.HouseBlockScanner;
 import com.teammoeg.frostedheart.content.town.house.HouseBlockEntity;
-import com.teammoeg.frostedheart.content.town.resource.action.SimpleResourceActionResult;
+import com.teammoeg.frostedheart.content.town.resource.SimpleResourceActionResult;
 import com.teammoeg.frostedheart.util.client.FHClientUtils;
 import com.teammoeg.frostedheart.content.town.blockscanner.BlockScanner;
 import com.teammoeg.frostedheart.content.town.blockscanner.FloorBlockScanner;

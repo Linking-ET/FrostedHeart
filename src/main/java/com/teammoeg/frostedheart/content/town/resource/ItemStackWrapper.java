@@ -27,6 +27,14 @@ public class ItemStackWrapper {
         this.itemStack = itemStack.copyWithCount(1);
     }
 
+    public static ItemStackWrapper of(ItemStack itemStack) {
+        return new ItemStackWrapper(itemStack);
+    }
+
+    public boolean equivalentTo(ItemStack itemStack) {
+        return ItemStack.isSameItemSameTags(this.itemStack, itemStack);
+    }
+
     public boolean equals(Object o) {
         ItemStack itemStack2;
         if (o instanceof ItemStackWrapper) {

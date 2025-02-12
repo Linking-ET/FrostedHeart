@@ -1,4 +1,4 @@
-package com.teammoeg.frostedheart.content.town.resource.action;
+package com.teammoeg.frostedheart.content.town.resource;
 
 /**
  * 历史遗留类，仅用于TownResourceManager中的部分方法，不推荐使用。
@@ -9,6 +9,7 @@ package com.teammoeg.frostedheart.content.town.resource.action;
 public record SimpleResourceActionResult(boolean allSuccess, double actualAmount) implements IResourceActionResult{
     public static final SimpleResourceActionResult NOT_SUCCESS = new SimpleResourceActionResult(false, 0);
 
+    @Deprecated
     public SimpleResourceActionResult(boolean allSuccess, double actualAmount){
         if(actualAmount<0){
             this.allSuccess = false;
@@ -27,5 +28,9 @@ public record SimpleResourceActionResult(boolean allSuccess, double actualAmount
     @Deprecated
     public IResourceAction getAction() {
         return null;
+    }
+
+    @Override
+    public void applyForce(TownResourceHolder holder) {
     }
 }

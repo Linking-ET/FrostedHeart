@@ -32,7 +32,7 @@ import com.teammoeg.chorda.util.lang.Components;
 import com.teammoeg.frostedheart.FHMain;
 import com.teammoeg.frostedheart.content.town.TeamTown;
 import com.teammoeg.frostedheart.content.town.resident.Resident;
-import com.teammoeg.frostedheart.content.town.resource.action.SimpleResourceActionResult;
+import com.teammoeg.frostedheart.content.town.resource.SimpleResourceActionResult;
 import com.teammoeg.frostedheart.util.client.Lang;
 import com.teammoeg.frostedheart.content.town.resource.*;
 import net.minecraft.commands.CommandSourceStack;
